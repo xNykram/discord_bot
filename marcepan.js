@@ -1,61 +1,77 @@
+// Marcepan Bot discord bot //
+// Version 0.2 by Nykram //
 const discord = require('discord.js');
 const client = new discord.Client();
+const editJsonFile = require("edit-json-file");
 const fs = require('fs');
 // #monitoring -> 625046909614293042
 // #ranking -> 619262539947311117
 const prefix = "!"
-const modNames = [
-    'Akaexus',
-    'Evans',
-    'Sabrina',
-    'Herato',
-    'Sniper',
-    'Songo',
-    'Dejv',
-    'chrzan',
-    'Kalman'
+modNames = [
+    "Akaexus",
+    "Evans",
+    "Carla",
+    "Herato",
+    "Dejv",
+    "Sniper",
+    "Kalman",
+    "Chrzan",
+    "Songo",
+    "Nishino",
+    "Richi",
+    "PRT"
+
 ];
-// funkcja zapisywania żartów do json
-saveJokeToFile = (name, joke) => {
-    this.name = name;
+// Dodawanie nowego żartu
+editDataJson = (username, joke) => {
+    let file = editJsonFile(`${__dirname}/jokes.json`);
+    this.name = username;
     this.joke = joke;
-    var data = {}
-    data.table = []
-        for (i=0; i < 1 ; i++){
-            var obj = {
-            moderator: this.name,
-            joke: this.joke
+    let jokes = file.get(this.name);    
+    if(file.get(this.name + ".nickname") == this.name){
+        let jokelenght = Object.keys(jokes).length -1;
+        if(jokelenght >= 1 && jokelenght < 5){
+                    jokelenght++;
+                    file.set(this.name + ".joke"+jokelenght, {
+                            content: this.joke
+                    });
+                    file.save();
             }
-            data.table.push(obj)
         }
-        fs.writeFile ("jokes.json", JSON.stringify(data), function(err) {
-            if (err) throw err;
-            }
-)};
-readJsonFromFile = () => {
-    let data = fs.readFileSync('jokes.json');
-    let moderator = JSON.parse(data);
-    console.log(moderator['table'][0]['joke']);
+    else{
+        file.set(this.name);
+        file.set(this.name + ".nickname", this.name);
+        file.set(this.name + ".joke1", {
+            content: this.joke
+        });
+        file.save();
+    }
 }
-readJsonFromFile();
-//saveJokeToFile('Sniper', 'dsassda');
-
-
-let Bot = function(version){
-    this.version = version;
-    this.message = function() {
-        console.log("hej");
-    };
+// Zwraca ilość żartów //
+amOfJokes = (username) => {
+    this.username = username;
+    let file = editJsonFile(`${__dirname}/jokes.json`);
+    if(file.get(this.username + ".nickname") == this.username){
+        let jokes = file.get(this.username);  
+        let jokelenght = Object.keys(jokes).length -1;
+        return jokelenght;
+    }
 }
-let marcepanMarks = new Bot("v0.01");
-
-
+// Zwraca żart //
+returnRandomJoke = (username) =>{
+    this.username = username;
+    let file = editJsonFile(`${__dirname}/jokes.json`);
+    if(file.get(this.username + ".nickname") == this.username){
+        let rng = Math.floor(Math.random()* amOfJokes(this.username)+1);
+        let obj = file.get(this.username + ".joke"+rng);
+        return obj['content'];
+    }
+}   
 client.on('ready', ()=> {
     console.log('Bot został pomyślnie wczytany!');
     client.user.setActivity('Mrucznik Role Play');
 });
     client.on('message', message => {
-        if (!message.content.startsWith(prefix) || message.author.bot) return;
         const args = message.content.slice(prefix.length).split(' ');
         const command = args.shift().toLowerCase();
         for (let i = 0; i < modNames.length; i++){
@@ -64,12 +80,23 @@ client.on('ready', ()=> {
                 if (!args.length) {
                     return message.channel.send(`Nie podałeś argumentów, ${message.author}!`);
                 } else {
-                    let output = args.toString().split(',').join(' ');
-                    saveJokeToFile(modNames[i], output);
-                    return message.channel.send(`${message.author}, pomyślnie dodano.`);
+                    let output = args.toString().split(',').join(' ').toLowerCase();
+                    editDataJson(modNames[i], output);
+                    if(amOfJokes(modNames[i]) == 5){
+                        return message.channel.send(`${message.author}, przekroczono limit dla `+ modNames[i] + ".");
+                    }
+                    else{
+                        return message.channel.send(`${message.author}, pomyślnie dodano.`);
+                    }
                 }
             } 
         }
-
+        for (let i = 0; i < modNames.length; i++){
+            let lower = modNames[i];
+            lower = lower.toLowerCase();
+            if(message.content.includes(modNames[i]) || message.content.includes(lower)){
+                return message.channel.send(returnRandomJoke(modNames[i]));
+            }
+        }
 });
 client.login('');

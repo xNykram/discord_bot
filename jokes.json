@@ -1,1 +1,8 @@
-{"table":[{"moderator":"Sniper","joke":"dsassda"}]}
+{
+  "Richi": {
+    "nickname": "Richi",
+    "joke1": {
+      "content": "kozaczek"
+    }
+  }
+}
