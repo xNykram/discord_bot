@@ -4,10 +4,16 @@ const discord = require('discord.js');
 const client = new discord.Client();
 const editJsonFile = require("edit-json-file");
 const fs = require('fs');
-// #monitoring -> 625046909614293042
-// #ranking -> 619262539947311117
+const cheerio = require('cheerio');
 const prefix = "!"
-modNames = [
+const request = require('request');
+
+const statusForum = [
+
+];
+
+
+const modNames = [
     "Akaexus",
     "Evans",
     "Carla",
@@ -67,9 +73,29 @@ returnRandomJoke = (username) =>{
         return obj['content'];
     }
 }   
+
+getForumStatus = () => {
+    let targeturl = [
+        'https://mrucznik-rp.pl/status/',
+        'https://mrucznik-rp.pl/status/php'
+    ];
+    for(let i = 0; i < 2; i++){
+        request({
+            method: 'GET',
+            url: targeturl[i]
+        }, (err, res, body) => {
+            if (err) { return console.log(err); }
+            const $ = cheerio.load(body);
+            let text = $('body');
+            statusForum[i] = text.text();
+        });
+    }
+
+}
 client.on('ready', ()=> {
     console.log('Bot został pomyślnie wczytany!');
     client.user.setActivity('Mrucznik Role Play');
+    getForumStatus();
 });
     client.on('message', message => {
         const args = message.content.slice(prefix.length).split(' ');
@@ -98,5 +124,22 @@ client.on('ready', ()=> {
                 return message.channel.send(returnRandomJoke(modNames[i]));
             }
         }
+        if(command === 'status'){
+            let monitoring = client.channels.get('609031533713686538');
+            monitoring.send({embed: {
+                color: 3447003,
+                fields: [{
+                    name: "Status Forum",
+                    value: 'CloudFlare: '+ statusForum[0]
+                },
+                {
+                    name: "Status PHP",
+                    value: 'PHP: ' + statusForum[1]
+                }
+                ],
+                timestamp: new Date(),
+              }});
+        }
 });
+
 client.login('');
