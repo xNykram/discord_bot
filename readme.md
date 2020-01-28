@@ -2,7 +2,7 @@
 
 
 ### O aplikacji
->  Jest to asystent stworzony pod serwer na platformie Discord. Posiada małą bazę danych i kilka przydatnych komend. Jest łatwy i prosty w obsłudze.
+>  Jest to asystent stworzony pod serwer na platformie Discord. Posiada małą bazę danych i kilka przydatnych komend. Łatwe i proste w obsłudze narzędzie.
 
 ### Działanie
 >  Asystent wyświetla losowy żart który jest przypisany do konkretnego użytkownika. Żart jest wyświetlany zwrotnie wiadomością. Informacje sa zamieszczane w małej lokalnej bazie danych. Można dodawać nowe żarty oraz modyfikować je. Bot równiez posiada dodatkową funkcję, która sprawdza czy dana strona działa sprawnie.
